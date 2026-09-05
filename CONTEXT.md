@@ -157,10 +157,8 @@ that registration is the one mechanism for adding a section type; see
 3. Regenerate types after a schema change: `pnpm generate:types`.
 4. Regenerate the import map after adding/removing an admin component:
    `pnpm generate:importmap`.
-5. Run a migration: `pnpm migrate`.
-6. Integration tests: `pnpm test:int`. End-to-end tests: `pnpm test:e2e`.
-   Per `COMPANY_POLICY.md`, creating or modifying tests needs explicit
-   test-engineer/lead-engineer approval regardless of who requests it.
+5. Run a migration: `pnpm migrate`. The template ships no tests; a project
+   adds its own if it wants them.
 
 ## Out Of Scope
 

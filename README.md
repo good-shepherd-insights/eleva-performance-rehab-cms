@@ -59,7 +59,6 @@ pnpm start               # Serve the production build
 pnpm lint                # Run ESLint
 pnpm generate:types      # Regenerate src/payload-types.ts
 pnpm generate:importmap  # Regenerate the Payload import map
-pnpm test:int            # Run integration tests
 ```
 
 ## API and MCP
