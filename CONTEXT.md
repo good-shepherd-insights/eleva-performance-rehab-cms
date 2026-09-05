@@ -20,11 +20,13 @@ over its REST API, and (for approved MCP clients) its MCP endpoint.
 
 This CMS supplies:
 
-1. Site chrome — brand, navigation, accessibility labels, footer
-   (the configured site global, `SITE_GLOBAL_SLUG`).
-2. Per-page content — generic ordered sections (hero, highlights, content,
-   mediaFeature, itemList, quote, callToAction) plus banner,
-   metadata (`pages` collection, one document per slug, `sections` blocks).
+1. Site shell data — brand (logo/logo alt/favicon), accessibility labels,
+   and repeatable global components (the configured site global,
+   `SITE_GLOBAL_SLUG`).
+2. Per-page content — each page's `sections` blocks
+   (`pages` collection, one document per slug). Both blocks fields ship
+   open (`blocks: []`); no block kinds are predefined, each project
+   registers its own.
 3. Media uploads and their metadata.
 4. Localized data (locales configured via `CMS_LOCALES`/`CMS_DEFAULT_LOCALE`)
    for both of the above.
@@ -39,8 +41,8 @@ This CMS supplies:
    email/password auth), `Media`, `Pages` (the per-page content
    collection).
 3. **Globals** (`src/globals/`): `SiteGlobals` (`src/globals/SiteGlobals.ts`)
-   — site chrome only (`brand`, `nav`, `accessibility`, `footer`), slug
-   required from `SITE_GLOBAL_SLUG` (no default).
+   — `brand`, an `accessibility` label group, and an open `components`
+   blocks field; slug required from `SITE_GLOBAL_SLUG` (no default).
 4. **Database:** Vercel Postgres (`@payloadcms/db-vercel-postgres`,
    `vercelPostgresAdapter`, reads `POSTGRES_URL`) — set
    in `payload.config.ts`, with `PAYLOAD_DB_PUSH` controlling schema push.
@@ -88,7 +90,7 @@ End-to-end, across both repositories:
    other side of that same bridge.
 4. Publishing a `pages` document (not draft-saving) fires the deploy
    webhook (item 11 above).
-5. The website's build fetches `SiteChrome` from
+5. The website's build fetches the site global from
    `/api/globals/<SITE_GLOBAL_SLUG>` and `Page` documents from `/api/pages`,
    validates them
    (`isCompletePage`/`hasLocalizedPageData` in the website's `payload.ts`),
@@ -101,32 +103,28 @@ End-to-end, across both repositories:
    behavior. Not verified here against Payload's docs; don't assume it
    matches the admin UI's behavior without checking.
 
-A schema change on the CMS side (a global field, or a `pages` blockType)
-that isn't mirrored in the website's `payload.ts` types and validation
-switches breaks step 5 — see `COMPANY_POLICY.md` Project Rule 3 / Banned
-rule 4.
+A schema change on the CMS side (a global field, or a block kind a project
+registers) that isn't mirrored in the website's `payload.ts` types breaks
+step 5 — see `COMPANY_POLICY.md` Project Rule 3 / Banned rule 4.
 
 ## Content Model
 
 Mirrors the split in `payload.config.ts`'s `collections`/`globals`:
 
 **Site global** (slug from `SITE_GLOBAL_SLUG`), exported as `SiteGlobals`
-(`src/globals/SiteGlobals.ts`) — site-wide chrome:
+(`src/globals/SiteGlobals.ts`):
 
 1. `brand` — logo, logo alt text, favicon.
-2. `nav` — repeatable items, `link` or `cta` type.
-3. `accessibility` — labels (skip link, menu, language switch, etc).
-4. `footer` — tagline, repeatable links, note.
+2. `accessibility` — shell labels (primary nav, skip link, menu, language
+   switch, home link suffix).
+3. `components` — an open blocks field (`blocks: []`): repeatable global
+   components a project defines by registering its own block kinds.
 
-**`pages` collection** (`src/collections/Pages.ts`,
-`src/fields/pageContent.ts`) — one document per slug, an ordered `sections`
-blocks array. `validateSections` enforces: at least one section, `hero`
-first, no duplicate blockType, and a fixed `sectionOrder`
-(`hero, highlights, content, mediaFeature, itemList, quote, callToAction`).
-Each
-blockType's fields come from one `createXField` factory in
-`pageContent.ts` — that pairing (factory + `blocks` entry +
-`sectionOrder` slot) is the one mechanism for adding a section type; see
+**`pages` collection** (`src/collections/Pages.ts`) — one document per slug,
+a `sections` blocks field. `validateSections` enforces: at least one section,
+and each section carries a string `blockType`. No block kinds are shipped;
+a project registers its own kinds in the `blocks` array in its own copy —
+that registration is the one mechanism for adding a section type; see
 `COMPANY_POLICY.md` Project Rule 3.
 
 ## Known Gaps (verified in source, not fixed here)
@@ -140,15 +138,15 @@ blockType's fields come from one `createXField` factory in
    unspecified. Not checked against Payload's docs here — do not assume it
    requires authentication, and do not assume it doesn't, before verifying
    against current Payload docs or a real request.
-2. **Publishing site chrome does not rebuild the website — only
+2. **Publishing the site global does not rebuild the website — only
    publishing a `pages` document does.** `src/globals/SiteGlobals.ts` has no
    `hooks` block at all (grep-verified: no `afterChange`, no reference to
    `WEBSITE_DEPLOY_WEBHOOK_URL`); only `src/collections/Pages.ts`
    has the deploy-webhook `afterChange` hook. An editor who changes and
-   publishes nav/footer/brand/accessibility content and expects the live
+   publishes brand/accessibility/components content and expects the live
    site to update will not see it until something else triggers a rebuild
    (e.g. a `pages` document is also published, or a manual deploy). Not
-   fixed here — this may be intentional (chrome changes rarer, bundled
+   fixed here — this may be intentional (shell changes rarer, bundled
    with other work) or an oversight; don't assume either without asking.
 
 ## Development

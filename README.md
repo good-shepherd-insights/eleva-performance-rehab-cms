@@ -4,13 +4,13 @@ Payload CMS backend for a multilingual website. This is a standalone Payload app
 
 ## What this manages
 
-- Multilingual site chrome (locales come from `CMS_LOCALES`) — brand,
-  navigation (with CTA items), accessibility labels, footer — in the
+- Multilingual site shell (locales come from `CMS_LOCALES`) — brand,
+  accessibility labels, and a `components` blocks field — in the
   configured site global (`SITE_GLOBAL_SLUG`)
-- Multilingual per-page content — generic ordered sections (hero, highlights,
-  content, mediaFeature, itemList, quote, callToAction) plus banner and
-  metadata — in the `pages` collection, one document per
-  slug, as an ordered `sections` block array
+- Multilingual per-page content — a `sections` blocks field — in the `pages`
+  collection, one document per slug. Both blocks fields ship open
+  (`blocks: []`); no block kinds are predefined, each project registers its
+  own in its own copy.
 - Media uploads (stored in Vercel Blob, not local disk)
 - Standard Payload admin authentication (email/password)
 - MCP access, scoped per resource (`Pages`: create/find/update; the
@@ -96,8 +96,7 @@ The Astro frontend uses the Payload API during development and can use the same 
 ```text
 src/
 ├── collections/       Users, Media, Pages
-├── globals/            SiteGlobals — site chrome only (brand/nav/accessibility/footer)
-├── fields/              pageContent.ts — one createXField factory per section blockType
+├── globals/            SiteGlobals — brand, accessibility labels, components blocks field
 ├── admin/               Payload admin components and Live Preview helpers
 ├── config/              runtime.ts — the required environment contract
 ├── app/                 Next.js routes for the admin, API, and MCP
@@ -112,7 +111,7 @@ Back up the Postgres database and Blob media independently before enabling edito
 
 ## Content workflow
 
-1. Edit site chrome in the configured site global, or page content in the `pages` collection, in Payload Admin.
+1. Edit the site shell (brand, accessibility, components) in the configured site global, or page sections in the `pages` collection, in Payload Admin.
 2. Preview changes through the Live Preview iframe — its URL is built per-document by `payload.config.ts`'s `livePreview.url`.
 3. Publish when ready. A configured `WEBSITE_DEPLOY_WEBHOOK_URL` is called only for published `pages` documents.
 4. Confirm the website is reading from `CMS_ORIGIN`.
