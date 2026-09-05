@@ -9,6 +9,7 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Components } from './collections/Components'
 import { SiteGlobals } from './globals/SiteGlobals'
 import { Pages } from './collections/Pages'
 import {
@@ -63,7 +64,7 @@ export default buildConfig({
         return siteOrigin
       },
       globals: [siteGlobalSlug],
-      collections: [Pages.slug],
+      collections: [Pages.slug, Components.slug],
       breakpoints: [
         { name: 'mobile', label: 'Mobile', width: 400, height: 900 },
         { name: 'tablet', label: 'Tablet', width: 900, height: 1000 },
@@ -71,7 +72,7 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Users, Media, Pages],
+  collections: [Users, Media, Components, Pages],
   globals: [SiteGlobals],
   editor: lexicalEditor(),
   localization: {

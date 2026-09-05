@@ -70,6 +70,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    components: Component;
     pages: Page;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -81,6 +82,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    components: ComponentsSelect<false> | ComponentsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -191,6 +193,22 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "components".
+ */
+export interface Component {
+  id: number;
+  /**
+   * Unique key for this reusable component. Referenced by the site global's curated components list.
+   */
+  slug: string;
+  title: string;
+  sections: unknown[];
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
 export interface Page {
@@ -295,6 +313,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'components';
+        value: number | Component;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -394,6 +416,18 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "components_select".
+ */
+export interface ComponentsSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  sections?: T | {};
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -503,7 +537,15 @@ export interface Site {
      */
     languageSwitchAriaLabelTemplate: string;
   };
-  components?: unknown[] | null;
+  components?:
+    | {
+        /**
+         * A reusable component document; its sections render globally on every page, in this order.
+         */
+        component: number | Component;
+        id?: string | null;
+      }[]
+    | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -529,7 +571,12 @@ export interface SiteSelect<T extends boolean = true> {
         menuLabel?: T;
         languageSwitchAriaLabelTemplate?: T;
       };
-  components?: T | {};
+  components?:
+    | T
+    | {
+        component?: T;
+        id?: T;
+      };
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

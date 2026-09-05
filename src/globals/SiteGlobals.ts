@@ -5,18 +5,6 @@ import { siteGlobalSlug } from '../config/runtime'
 
 const slug = siteGlobalSlug
 
-function validateComponents(value: unknown) {
-  if (!Array.isArray(value)) {
-    return true
-  }
-
-  if (!value.every((component) => component && typeof component === 'object' && typeof component.blockType === 'string')) {
-    return 'Each component requires a blockType.'
-  }
-
-  return true
-}
-
 const brand = {
   name: 'brand', type: 'group' as const, fields: [
     { name: 'logo', type: 'upload' as const, relationTo: 'media' as const, required: true },
@@ -47,7 +35,13 @@ export const SiteGlobals: GlobalConfig = {
           ],
         },
         {
-          name: 'components', type: 'blocks', minRows: 0, validate: validateComponents, blocks: [],
+          name: 'components', type: 'array', minRows: 0, labels: { singular: 'Global component', plural: 'Global components' },
+          fields: [
+            {
+              name: 'component', type: 'relationship', relationTo: 'components', required: true,
+              admin: { description: 'A reusable component document; its sections render globally on every page, in this order.' },
+            },
+          ],
         },
       ] },
     ],
