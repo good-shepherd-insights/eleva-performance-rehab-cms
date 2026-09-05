@@ -91,14 +91,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | string | string[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'ko') | ('en' | 'ko')[];
   globals: {
     site: Site;
   };
   globalsSelect: {
     site: SiteSelect<false> | SiteSelect<true>;
   };
-  locale: string;
+  locale: 'en' | 'ko';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -200,142 +200,13 @@ export interface Page {
    */
   slug: string;
   title: string;
-  banner: {
-    backLabel: string;
-    centerLabel: string;
-    nextLabel: string;
-    nextHref: string;
-  };
   metadata: {
     /**
      * Use exactly one {title} placeholder for the localized page title.
      */
     titleTemplate: string;
   };
-  sections: (
-    | {
-        hero: {
-          kicker: string;
-          headline: string;
-          subhead: string;
-          image: number | Media;
-          imageAlt: string;
-          visualCaption: string;
-          secondaryCtaLabel: string;
-          primaryCtaHref: string;
-          secondaryCtaHref: string;
-        };
-        process: {
-          steps?:
-            | {
-                label: string;
-                id?: string | null;
-              }[]
-            | null;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'hero';
-      }
-    | {
-        highlights: {
-          items?:
-            | {
-                label: string;
-                id?: string | null;
-              }[]
-            | null;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'highlights';
-      }
-    | {
-        content: {
-          headingTop: string;
-          headingBottom: string;
-          intro: string;
-          pillars?:
-            | {
-                index: string;
-                title: string;
-                body: string;
-                id?: string | null;
-              }[]
-            | null;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'content';
-      }
-    | {
-        mediaFeature: {
-          photo: number | Media;
-          photoAlt: string;
-          kicker: string;
-          headingTop: string;
-          headingBottom: string;
-          steps?:
-            | {
-                number: string;
-                title: string;
-                body: string;
-                id?: string | null;
-              }[]
-            | null;
-          linkLabel: string;
-          linkHref: string;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'mediaFeature';
-      }
-    | {
-        itemList: {
-          kicker: string;
-          heading: string;
-          intro: string;
-          items?:
-            | {
-                title: string;
-                detail: string;
-                tag: string;
-                itemLabel: string;
-                viewLabel: string;
-                viewAriaLabel: string;
-                href: string;
-                id?: string | null;
-              }[]
-            | null;
-          allLabel: string;
-          allHref: string;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'itemList';
-      }
-    | {
-        quote: {
-          quote: string;
-          attribution: string;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'quote';
-      }
-    | {
-        callToAction: {
-          kicker: string;
-          headingTop: string;
-          headingBottom: string;
-          ctaLabel: string;
-          href: string;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'callToAction';
-      }
-  )[];
+  sections: unknown[];
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -531,168 +402,12 @@ export interface MediaSelect<T extends boolean = true> {
 export interface PagesSelect<T extends boolean = true> {
   slug?: T;
   title?: T;
-  banner?:
-    | T
-    | {
-        backLabel?: T;
-        centerLabel?: T;
-        nextLabel?: T;
-        nextHref?: T;
-      };
   metadata?:
     | T
     | {
         titleTemplate?: T;
       };
-  sections?:
-    | T
-    | {
-        hero?:
-          | T
-          | {
-              hero?:
-                | T
-                | {
-                    kicker?: T;
-                    headline?: T;
-                    subhead?: T;
-                    image?: T;
-                    imageAlt?: T;
-                    visualCaption?: T;
-                    secondaryCtaLabel?: T;
-                    primaryCtaHref?: T;
-                    secondaryCtaHref?: T;
-                  };
-              process?:
-                | T
-                | {
-                    steps?:
-                      | T
-                      | {
-                          label?: T;
-                          id?: T;
-                        };
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        highlights?:
-          | T
-          | {
-              highlights?:
-                | T
-                | {
-                    items?:
-                      | T
-                      | {
-                          label?: T;
-                          id?: T;
-                        };
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        content?:
-          | T
-          | {
-              content?:
-                | T
-                | {
-                    headingTop?: T;
-                    headingBottom?: T;
-                    intro?: T;
-                    pillars?:
-                      | T
-                      | {
-                          index?: T;
-                          title?: T;
-                          body?: T;
-                          id?: T;
-                        };
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        mediaFeature?:
-          | T
-          | {
-              mediaFeature?:
-                | T
-                | {
-                    photo?: T;
-                    photoAlt?: T;
-                    kicker?: T;
-                    headingTop?: T;
-                    headingBottom?: T;
-                    steps?:
-                      | T
-                      | {
-                          number?: T;
-                          title?: T;
-                          body?: T;
-                          id?: T;
-                        };
-                    linkLabel?: T;
-                    linkHref?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        itemList?:
-          | T
-          | {
-              itemList?:
-                | T
-                | {
-                    kicker?: T;
-                    heading?: T;
-                    intro?: T;
-                    items?:
-                      | T
-                      | {
-                          title?: T;
-                          detail?: T;
-                          tag?: T;
-                          itemLabel?: T;
-                          viewLabel?: T;
-                          viewAriaLabel?: T;
-                          href?: T;
-                          id?: T;
-                        };
-                    allLabel?: T;
-                    allHref?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        quote?:
-          | T
-          | {
-              quote?:
-                | T
-                | {
-                    quote?: T;
-                    attribution?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        callToAction?:
-          | T
-          | {
-              callToAction?:
-                | T
-                | {
-                    kicker?: T;
-                    headingTop?: T;
-                    headingBottom?: T;
-                    ctaLabel?: T;
-                    href?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-      };
+  sections?: T | {};
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -778,24 +493,8 @@ export interface Site {
      */
     favicon: number | Media;
   };
-  nav?: {
-    items?:
-      | {
-          type: 'link' | 'cta';
-          label: string;
-          /**
-           * Use an anchor such as #about or a full URL.
-           */
-          href: string;
-          openInNewTab?: boolean | null;
-          id?: string | null;
-        }[]
-      | null;
-  };
   accessibility: {
     primaryNavLabel: string;
-    heroOverviewLabel: string;
-    programSummaryLabel: string;
     homeLinkSuffix: string;
     skipToContentLabel: string;
     menuLabel: string;
@@ -804,17 +503,7 @@ export interface Site {
      */
     languageSwitchAriaLabelTemplate: string;
   };
-  footer: {
-    tagline: string;
-    links?:
-      | {
-          label: string;
-          href: string;
-          id?: string | null;
-        }[]
-      | null;
-    note: string;
-  };
+  components?: unknown[] | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -831,43 +520,16 @@ export interface SiteSelect<T extends boolean = true> {
         logoAlt?: T;
         favicon?: T;
       };
-  nav?:
-    | T
-    | {
-        items?:
-          | T
-          | {
-              type?: T;
-              label?: T;
-              href?: T;
-              openInNewTab?: T;
-              id?: T;
-            };
-      };
   accessibility?:
     | T
     | {
         primaryNavLabel?: T;
-        heroOverviewLabel?: T;
-        programSummaryLabel?: T;
         homeLinkSuffix?: T;
         skipToContentLabel?: T;
         menuLabel?: T;
         languageSwitchAriaLabelTemplate?: T;
       };
-  footer?:
-    | T
-    | {
-        tagline?: T;
-        links?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-              id?: T;
-            };
-        note?: T;
-      };
+  components?: T | {};
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

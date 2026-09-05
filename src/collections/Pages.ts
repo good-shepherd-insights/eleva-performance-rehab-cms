@@ -1,47 +1,19 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
 
-import {
-  createBannerField,
-  createCallToActionField,
-  createContentField,
-  createHeroField,
-  createHighlightsField,
-  createItemListField,
-  createMediaFeatureField,
-  createMetadataField,
-  createProcessField,
-  createQuoteField,
-} from '../fields/pageContent'
 import { defaultLocale, siteGlobalSlug, websiteDeployWebhook } from '../config/runtime'
 
 const globalSlug = siteGlobalSlug
-const sectionOrder = ['hero', 'highlights', 'content', 'mediaFeature', 'itemList', 'quote', 'callToAction']
 const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
 
 function validateSections(value: unknown) {
   if (!Array.isArray(value) || value.length === 0) {
-    return 'A Page requires at least one section, including Hero.'
+    return 'A Page requires at least one section.'
   }
 
-  const types = value.map((section) => (section && typeof section === 'object' ? section.blockType : undefined))
-
-  if (types[0] !== 'hero') {
-    return 'Hero must be the first section.'
-  }
-
-  if (new Set(types).size !== types.length) {
-    return 'Each Page section type may be used only once.'
-  }
-
-  for (let index = 1; index < types.length; index += 1) {
-    const previous = sectionOrder.indexOf(types[index - 1] as string)
-    const current = sectionOrder.indexOf(types[index] as string)
-
-    if (current <= previous) {
-      return `Sections must follow this order: ${sectionOrder.join(', ')}.`
-    }
+  if (!value.every((section) => section && typeof section === 'object' && typeof section.blockType === 'string')) {
+    return 'Each section requires a blockType.'
   }
 
   return true
@@ -74,7 +46,13 @@ export function isPageDraftOperation({
   return context?.pagesDraftOperation === true || query?.draft === 'true'
 }
 
-const metadata = createMetadataField({ isRequired: true, pageTitle: true })
+const metadata: Field = {
+  name: 'metadata', type: 'group', required: true, fields: [{
+    name: 'titleTemplate', localized: true, type: 'text', required: true,
+    defaultValue: '{title}',
+    admin: { description: 'Use exactly one {title} placeholder for the localized page title.' },
+  }],
+}
 if (metadata.type === 'group') {
   const titleTemplate = metadata.fields.find((field) => 'name' in field && field.name === 'titleTemplate')
   if (titleTemplate && titleTemplate.type === 'text') titleTemplate.validate = validateTitleTemplate
@@ -179,7 +157,6 @@ export const Pages: CollectionConfig = {
       localized: true,
       required: true,
     },
-    createBannerField(true),
     metadata,
     {
       name: 'sections',
@@ -187,43 +164,7 @@ export const Pages: CollectionConfig = {
       required: true,
       minRows: 1,
       validate: validateSections,
-      blocks: [
-        {
-          slug: 'hero',
-          labels: { singular: 'Hero', plural: 'Hero' },
-          fields: [createHeroField(true), createProcessField(true)],
-        },
-        {
-          slug: 'highlights',
-          labels: { singular: 'Highlights', plural: 'Highlights' },
-          fields: [createHighlightsField(true)],
-        },
-        {
-          slug: 'content',
-          labels: { singular: 'Content', plural: 'Content' },
-          fields: [createContentField(true)],
-        },
-        {
-          slug: 'mediaFeature',
-          labels: { singular: 'Media feature', plural: 'Media features' },
-          fields: [createMediaFeatureField(true)],
-        },
-        {
-          slug: 'itemList',
-          labels: { singular: 'Item list', plural: 'Item lists' },
-          fields: [createItemListField(true)],
-        },
-        {
-          slug: 'quote',
-          labels: { singular: 'Quote', plural: 'Quotes' },
-          fields: [createQuoteField(true)],
-        },
-        {
-          slug: 'callToAction',
-          labels: { singular: 'Call to action', plural: 'Calls to action' },
-          fields: [createCallToActionField(true)],
-        },
-      ],
+      blocks: [],
     },
   ],
 }
