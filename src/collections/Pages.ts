@@ -2,9 +2,8 @@ import type { CollectionConfig, Field } from 'payload'
 
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
 
-import { defaultLocale, siteGlobalSlug, websiteDeployWebhook } from '../config/runtime'
+import { websiteDeployWebhook } from '../config/runtime'
 
-const globalSlug = siteGlobalSlug
 const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
 
 function validateSections(value: unknown) {
@@ -83,27 +82,9 @@ export const Pages: CollectionConfig = {
       },
     ],
     beforeValidate: [
-      async ({ context, data, req }) => {
+      ({ data }) => {
         if (data && typeof data.slug === 'string') {
           data.slug = data.slug.trim().toLowerCase()
-        }
-
-        // Draft intent is recorded by beforeOperation from Payload's `draft`
-        // argument. Document data is not trusted because callers can submit
-        // `_status: draft` while requesting a published operation.
-        const savingDraft = isPageDraftOperation({ context, query: req.query })
-        if (!savingDraft && context.pagesMigration !== true) {
-          const homePage = (await (req.payload.findGlobal as <T>(args: Record<string, unknown>) => Promise<T>)({
-            slug: globalSlug,
-            depth: 0,
-            locale: defaultLocale,
-            overrideAccess: true,
-          })) as { nav?: { items?: { type?: string }[] } | null }
-          const ctaCount = homePage.nav?.items?.filter((item) => item.type === 'cta').length || 0
-
-          if (ctaCount !== 1) {
-            throw new Error('Pages require exactly one CTA item in the site-wide navigation before publishing.')
-          }
         }
 
         return data
