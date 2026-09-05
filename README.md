@@ -4,11 +4,14 @@ Payload CMS backend for a multilingual website. This is a standalone Payload app
 
 ## What this manages
 
-- Multilingual site shell (locales come from `CMS_LOCALES`) — brand,
-  accessibility labels, and a `components` blocks field — in the
-  configured site global (`SITE_GLOBAL_SLUG`)
+- Multilingual site shell (locales come from `CMS_LOCALES`) — brand and
+  accessibility labels in the configured site global (`SITE_GLOBAL_SLUG`),
+  plus an ordered `components` curation list that renders globally on every
+  page
+- Reusable global components — the `components` collection, one document
+  per component, each holding an open `sections` blocks field
 - Multilingual per-page content — a `sections` blocks field — in the `pages`
-  collection, one document per slug. Both blocks fields ship open
+  collection, one document per slug. All blocks fields ship open
   (`blocks: []`); no block kinds are predefined, each project registers its
   own in its own copy.
 - Media uploads (stored in Vercel Blob, not local disk)
@@ -63,7 +66,8 @@ pnpm generate:importmap  # Regenerate the Payload import map
 
 ## API and MCP
 
-The REST API is available under `/api`. Site chrome is read from the
+The REST API is available under `/api`. The site shell (brand,
+accessibility, curated components) is read from the
 configured site global (`SITE_GLOBAL_SLUG`) by locale — shown here with the
 placeholder `<global-slug>`:
 
@@ -94,8 +98,8 @@ The Astro frontend uses the Payload API during development and can use the same 
 
 ```text
 src/
-├── collections/       Users, Media, Pages
-├── globals/            SiteGlobals — brand, accessibility labels, components blocks field
+├── collections/       Users, Media, Components, Pages
+├── globals/            SiteGlobals — brand, accessibility labels, ordered components curation
 ├── admin/               Payload admin components and Live Preview helpers
 ├── config/              runtime.ts — the required environment contract
 ├── app/                 Next.js routes for the admin, API, and MCP

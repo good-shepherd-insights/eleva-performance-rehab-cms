@@ -20,29 +20,32 @@ over its REST API, and (for approved MCP clients) its MCP endpoint.
 
 This CMS supplies:
 
-1. Site shell data — brand (logo/logo alt/favicon), accessibility labels,
-   and repeatable global components (the configured site global,
-   `SITE_GLOBAL_SLUG`).
-2. Per-page content — each page's `sections` blocks
-   (`pages` collection, one document per slug). Both blocks fields ship
+1. Site shell data — brand (logo/logo alt/favicon) and accessibility labels
+   (the configured site global, `SITE_GLOBAL_SLUG`).
+2. Reusable global components — the `components` collection (one document
+   per component, each holding an open `sections` blocks field), curated
+   onto every page through the site global's ordered `components` list.
+3. Per-page content — each page's `sections` blocks
+   (`pages` collection, one document per slug). All blocks fields ship
    open (`blocks: []`); no block kinds are predefined, each project
    registers its own.
-3. Media uploads and their metadata.
-4. Localized data (locales configured via `CMS_LOCALES`/`CMS_DEFAULT_LOCALE`)
+4. Media uploads and their metadata.
+5. Localized data (locales configured via `CMS_LOCALES`/`CMS_DEFAULT_LOCALE`)
    for both of the above.
-5. Live Preview data and URLs for the website's preview iframe.
-6. Admin authentication, via standard Payload email/password auth.
+6. Live Preview data and URLs for the website's preview iframe.
+7. Admin authentication, via standard Payload email/password auth.
 
 ## Runtime Architecture
 
 1. Next.js hosts the Payload admin, REST/GraphQL API, and MCP endpoint
    (`src/app`, `src/payload.config.ts`).
 2. **Collections** (`src/collections/`): `Users` (standard Payload
-   email/password auth), `Media`, `Pages` (the per-page content
-   collection).
+   email/password auth), `Media`, `Components` (reusable component
+   documents), `Pages` (the per-page content collection).
 3. **Globals** (`src/globals/`): `SiteGlobals` (`src/globals/SiteGlobals.ts`)
-   — `brand`, an `accessibility` label group, and an open `components`
-   blocks field; slug required from `SITE_GLOBAL_SLUG` (no default).
+   — `brand`, an `accessibility` label group, and a `components` array
+   (ordered relationships to `components` documents); slug required from
+   `SITE_GLOBAL_SLUG` (no default).
 4. **Database:** Vercel Postgres (`@payloadcms/db-vercel-postgres`,
    `vercelPostgresAdapter`, reads `POSTGRES_URL`) — set
    in `payload.config.ts`, with `PAYLOAD_DB_PUSH` controlling schema push.
@@ -77,12 +80,13 @@ End-to-end, across both repositories:
 
 1. An editor authenticates to the CMS admin with standard Payload
    email/password credentials.
-2. They edit the configured site global (`SiteGlobals`, chrome) or a `pages`
-   document (page content). Both are versioned with drafts
-   (`versions.drafts`), but not identically: the site global autosaves every
-   800ms (`versions.drafts.autosave.interval`, `SiteGlobals.ts`); `pages`
-   has `versions.drafts: true` with no autosave config found in
-   `Pages.ts` — don't assume `pages` documents autosave the same way.
+2. They edit the configured site global (`SiteGlobals`, brand/
+   accessibility/components curation), a `components` document, or a
+   `pages` document (page content). All are versioned with drafts
+   (`versions.drafts`), but not identically: the site global autosaves
+   every 800ms (`versions.drafts.autosave.interval`, `SiteGlobals.ts`);
+   `pages` and `components` have `versions.drafts: true` with no autosave
+   config — don't assume they autosave the same way.
 3. Editing a `pages` document renders the website's actual `Layout`/
    `PageView` inside Payload's own Live Preview iframe, wired by
    `livePreview.url` (item 8 above) plus the website's
@@ -117,8 +121,13 @@ Mirrors the split in `payload.config.ts`'s `collections`/`globals`:
 1. `brand` — logo, logo alt text, favicon.
 2. `accessibility` — shell labels (primary nav, skip link, menu, language
    switch, home link suffix).
-3. `components` — an open blocks field (`blocks: []`): repeatable global
-   components a project defines by registering its own block kinds.
+3. `components` — an ordered array of relationships to `components`
+   documents; this curation renders globally on every page, in this order.
+
+**`components` collection** (`src/collections/Components.ts`) — one document
+per reusable component (unique slug + title), each holding a `sections`
+blocks field with the same generic validation as Pages. A project registers
+its own block kinds and composes them here.
 
 **`pages` collection** (`src/collections/Pages.ts`) — one document per slug,
 a `sections` blocks field. `validateSections` enforces: at least one section,
