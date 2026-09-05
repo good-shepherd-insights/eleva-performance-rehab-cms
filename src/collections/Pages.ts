@@ -1,0 +1,229 @@
+import type { CollectionConfig } from 'payload'
+
+import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
+
+import {
+  createBannerField,
+  createCallToActionField,
+  createContentField,
+  createHeroField,
+  createHighlightsField,
+  createItemListField,
+  createMediaFeatureField,
+  createMetadataField,
+  createProcessField,
+  createQuoteField,
+} from '../fields/pageContent'
+import { defaultLocale, siteGlobalSlug, websiteDeployWebhook } from '../config/runtime'
+
+const globalSlug = siteGlobalSlug
+const sectionOrder = ['hero', 'highlights', 'content', 'mediaFeature', 'itemList', 'quote', 'callToAction']
+const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
+
+function validateSections(value: unknown) {
+  if (!Array.isArray(value) || value.length === 0) {
+    return 'A Page requires at least one section, including Hero.'
+  }
+
+  const types = value.map((section) => (section && typeof section === 'object' ? section.blockType : undefined))
+
+  if (types[0] !== 'hero') {
+    return 'Hero must be the first section.'
+  }
+
+  if (new Set(types).size !== types.length) {
+    return 'Each Page section type may be used only once.'
+  }
+
+  for (let index = 1; index < types.length; index += 1) {
+    const previous = sectionOrder.indexOf(types[index - 1] as string)
+    const current = sectionOrder.indexOf(types[index] as string)
+
+    if (current <= previous) {
+      return `Sections must follow this order: ${sectionOrder.join(', ')}.`
+    }
+  }
+
+  return true
+}
+
+function validateTitleTemplate(value: unknown) {
+  if (typeof value !== 'string') return 'A title template is required.'
+
+  const placeholders = value.match(/\{[^}]+\}/g) || []
+  const withoutPlaceholders = value.replace(/\{[^}]+\}/g, '')
+  if (
+    placeholders.length !== 1 ||
+    placeholders[0] !== '{title}' ||
+    withoutPlaceholders.includes('{') ||
+    withoutPlaceholders.includes('}')
+  ) {
+    return 'Use exactly one {title} placeholder and no other placeholders.'
+  }
+
+  return true
+}
+
+export function isPageDraftOperation({
+  context,
+  query,
+}: {
+  context?: Record<string, unknown>
+  query?: Record<string, unknown>
+}) {
+  return context?.pagesDraftOperation === true || query?.draft === 'true'
+}
+
+const metadata = createMetadataField({ isRequired: true, pageTitle: true })
+if (metadata.type === 'group') {
+  const titleTemplate = metadata.fields.find((field) => 'name' in field && field.name === 'titleTemplate')
+  if (titleTemplate && titleTemplate.type === 'text') titleTemplate.validate = validateTitleTemplate
+}
+
+export const Pages: CollectionConfig = {
+  slug: 'pages',
+  admin: {
+    group: 'Pages',
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'slug', '_status', 'updatedAt'],
+    ...inlinePreviewAdmin,
+  },
+  access: {
+    read: () => true,
+  },
+  versions: {
+    drafts: true,
+  },
+  hooks: {
+    beforeOperation: [
+      ({ args, context, operation }) => {
+        if (operation === 'create' || operation === 'update') {
+          context.pagesDraftOperation = args.draft === true
+        }
+
+        return args
+      },
+    ],
+    beforeValidate: [
+      async ({ context, data, req }) => {
+        if (data && typeof data.slug === 'string') {
+          data.slug = data.slug.trim().toLowerCase()
+        }
+
+        // Draft intent is recorded by beforeOperation from Payload's `draft`
+        // argument. Document data is not trusted because callers can submit
+        // `_status: draft` while requesting a published operation.
+        const savingDraft = isPageDraftOperation({ context, query: req.query })
+        if (!savingDraft && context.pagesMigration !== true) {
+          const homePage = (await (req.payload.findGlobal as <T>(args: Record<string, unknown>) => Promise<T>)({
+            slug: globalSlug,
+            depth: 0,
+            locale: defaultLocale,
+            overrideAccess: true,
+          })) as { nav?: { items?: { type?: string }[] } | null }
+          const ctaCount = homePage.nav?.items?.filter((item) => item.type === 'cta').length || 0
+
+          if (ctaCount !== 1) {
+            throw new Error('Pages require exactly one CTA item in the site-wide navigation before publishing.')
+          }
+        }
+
+        return data
+      },
+    ],
+    afterChange: [
+      async ({ doc, req }) => {
+        if (doc._status !== 'published') return doc
+        if (!websiteDeployWebhook) return doc
+
+        try {
+          const response = await fetch(websiteDeployWebhook, { method: 'POST' })
+          if (!response.ok) {
+            throw new Error(`Website deploy webhook failed with ${response.status} ${response.statusText}`)
+          }
+        } catch (error) {
+          req.payload.logger.error(error instanceof Error ? error.message : 'Website deploy webhook failed')
+          throw error
+        }
+
+        return doc
+      },
+    ],
+  },
+  fields: [
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      validate: (value: unknown) => {
+        if (
+          typeof value !== 'string' ||
+          reservedSlugs.has(value) ||
+          !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ||
+          value.length > 80
+        ) {
+          return 'Use 1–80 lowercase ASCII letters or numbers separated by single hyphens.'
+        }
+        return true
+      },
+      admin: {
+        description: 'Shared route key. Example: about → /<locale>/about.',
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'title',
+      type: 'text',
+      localized: true,
+      required: true,
+    },
+    createBannerField(true),
+    metadata,
+    {
+      name: 'sections',
+      type: 'blocks',
+      required: true,
+      minRows: 1,
+      validate: validateSections,
+      blocks: [
+        {
+          slug: 'hero',
+          labels: { singular: 'Hero', plural: 'Hero' },
+          fields: [createHeroField(true), createProcessField(true)],
+        },
+        {
+          slug: 'highlights',
+          labels: { singular: 'Highlights', plural: 'Highlights' },
+          fields: [createHighlightsField(true)],
+        },
+        {
+          slug: 'content',
+          labels: { singular: 'Content', plural: 'Content' },
+          fields: [createContentField(true)],
+        },
+        {
+          slug: 'mediaFeature',
+          labels: { singular: 'Media feature', plural: 'Media features' },
+          fields: [createMediaFeatureField(true)],
+        },
+        {
+          slug: 'itemList',
+          labels: { singular: 'Item list', plural: 'Item lists' },
+          fields: [createItemListField(true)],
+        },
+        {
+          slug: 'quote',
+          labels: { singular: 'Quote', plural: 'Quotes' },
+          fields: [createQuoteField(true)],
+        },
+        {
+          slug: 'callToAction',
+          labels: { singular: 'Call to action', plural: 'Calls to action' },
+          fields: [createCallToActionField(true)],
+        },
+      ],
+    },
+  ],
+}

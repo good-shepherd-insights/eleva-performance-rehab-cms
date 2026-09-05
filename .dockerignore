@@ -1,0 +1,11 @@
+.git
+.next
+node_modules
+coverage
+dist
+*.log
+.env
+.env.*
+!.env.example
+media
+user-avatars
