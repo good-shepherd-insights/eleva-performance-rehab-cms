@@ -7,7 +7,7 @@ This policy is mandatory. Violations are blocking issues.
 1. Violating this policy is illegal under this repository policy.
 2. If a violation occurs, stop work, disclose it, and remove or correct it before continuing.
 3. Do not minimize, rename, defer, normalize, or build on a violation.
-4. Repeated or intentional violations must be escalated to the lead engineer or responsible reviewer.
+4. Repeated or intentional violations must be escalated to the project's designated reviewer or maintainer.
 
 ## Authority
 
@@ -54,8 +54,8 @@ This policy is mandatory. Violations are blocking issues.
 12. Do not alter `Users.ts`'s authentication configuration without approval — standard Payload email/password auth is the only admin login path; breaking it locks out every admin at once.
 13. Do not add dependencies, tooling, generated assets, framework integrations, reports, logs, archives, screenshots, or temporary artifacts without approval.
 14. Do not commit scripts, script directories, automation helpers, one-off commands, generated command wrappers, or unapproved `package.json` script changes.
-15. Do not create, modify, rename, delete, or scaffold tests without explicit approval from a test engineer or lead engineer.
-16. Do not add test fixtures, fake test data, snapshots, mocks, harnesses, coverage tooling, or test-support utilities without explicit approval from a test engineer or lead engineer.
+15. Do not create, modify, rename, delete, or scaffold tests without explicit approval from the project's designated reviewer or maintainer.
+16. Do not add test fixtures, fake test data, snapshots, mocks, harnesses, coverage tooling, or test-support utilities without explicit approval from the project's designated reviewer or maintainer.
 17. Do not treat a request to verify, build, check, review, or improve quality as permission to create or modify tests.
 18. Do not claim tests, builds, migrations, or external documentation reviews were performed unless they were performed.
 19. Do not commit, push, open PRs, deploy, rename branches, run destructive git operations, install packages, change dependencies, run migrations against a shared database, or alter external services without approval.
