@@ -1,5 +1,7 @@
 import type { CollectionConfig, Field } from 'payload'
 
+import { sharedBlocks } from '@good-shepherd-insights/website-components/payload'
+
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
 
 import { websiteDeployWebhook } from '../config/runtime'
@@ -145,7 +147,7 @@ export const Pages: CollectionConfig = {
       required: true,
       minRows: 1,
       validate: validateSections,
-      blocks: [],
+      blocks: [...sharedBlocks],
     },
   ],
 }

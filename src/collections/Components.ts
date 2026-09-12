@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
+import { sharedBlocks } from '@good-shepherd-insights/website-components/payload'
+
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
 
 const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
@@ -65,7 +67,7 @@ export const Components: CollectionConfig = {
       required: true,
       minRows: 1,
       validate: validateSections,
-      blocks: [],
+      blocks: [...sharedBlocks],
     },
   ],
 }
