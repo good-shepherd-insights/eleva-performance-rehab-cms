@@ -4,10 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@good-shepherd-insights/website-components': link:../website-components-template
+
 importers:
 
   .:
     dependencies:
+      '@good-shepherd-insights/website-components':
+        specifier: link:../website-components-template
+        version: link:../website-components-template
       '@payloadcms/db-vercel-postgres':
         specifier: 3.88.0
         version: 3.88.0(@libsql/client@0.14.0(bufferutil@4.1.0))(@types/pg@8.11.6)(kysely@0.29.5)(payload@3.88.0(bufferutil@4.1.0)(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.3))(supports-color@7.2.0)

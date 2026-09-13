@@ -70,7 +70,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    components: Component;
+    sections: Section;
     pages: Page;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
@@ -82,7 +82,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    components: ComponentsSelect<false> | ComponentsSelect<true>;
+    sections: SectionsSelect<false> | SectionsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -93,14 +93,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'ko') | ('en' | 'ko')[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'en' | 'en'[];
   globals: {
-    site: Site;
+    'site-globals': SiteGlobal;
   };
   globalsSelect: {
-    site: SiteSelect<false> | SiteSelect<true>;
+    'site-globals': SiteGlobalsSelect<false> | SiteGlobalsSelect<true>;
   };
-  locale: 'en' | 'ko';
+  locale: 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -193,16 +193,37 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "components".
+ * via the `definition` "sections".
  */
-export interface Component {
+export interface Section {
   id: number;
   /**
-   * Unique key for this reusable component. Referenced by the site global's curated components list.
+   * Unique key for this reusable section bundle. Referenced by the site global's curated components list.
    */
   slug: string;
   title: string;
-  sections: unknown[];
+  sections: {
+    logo: number | Media;
+    searchPlaceholder: string;
+    searchAction: string;
+    servicesLabel: string;
+    servicesHref: string;
+    callLabel: string;
+    callHref: string;
+    primaryLabel: string;
+    primaryHref: string;
+    brandLabel?: string | null;
+    links?:
+      | {
+          label?: string | null;
+          href?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+    blockName?: string | null;
+    blockType: 'navbar';
+  }[];
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -224,7 +245,28 @@ export interface Page {
      */
     titleTemplate: string;
   };
-  sections: unknown[];
+  sections: {
+    logo: number | Media;
+    searchPlaceholder: string;
+    searchAction: string;
+    servicesLabel: string;
+    servicesHref: string;
+    callLabel: string;
+    callHref: string;
+    primaryLabel: string;
+    primaryHref: string;
+    brandLabel?: string | null;
+    links?:
+      | {
+          label?: string | null;
+          href?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+    blockName?: string | null;
+    blockType: 'navbar';
+  }[];
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -263,13 +305,13 @@ export interface PayloadMcpApiKey {
      */
     update?: boolean | null;
   };
-  site?: {
+  siteGlobals?: {
     /**
-     * Allow clients to find site global.
+     * Allow clients to find site-globals global.
      */
     find?: boolean | null;
     /**
-     * Allow clients to update site global.
+     * Allow clients to update site-globals global.
      */
     update?: boolean | null;
   };
@@ -313,8 +355,8 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'components';
-        value: number | Component;
+        relationTo: 'sections';
+        value: number | Section;
       } | null)
     | ({
         relationTo: 'pages';
@@ -419,12 +461,38 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "components_select".
+ * via the `definition` "sections_select".
  */
-export interface ComponentsSelect<T extends boolean = true> {
+export interface SectionsSelect<T extends boolean = true> {
   slug?: T;
   title?: T;
-  sections?: T | {};
+  sections?:
+    | T
+    | {
+        navbar?:
+          | T
+          | {
+              logo?: T;
+              searchPlaceholder?: T;
+              searchAction?: T;
+              servicesLabel?: T;
+              servicesHref?: T;
+              callLabel?: T;
+              callHref?: T;
+              primaryLabel?: T;
+              primaryHref?: T;
+              brandLabel?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -441,7 +509,33 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         titleTemplate?: T;
       };
-  sections?: T | {};
+  sections?:
+    | T
+    | {
+        navbar?:
+          | T
+          | {
+              logo?: T;
+              searchPlaceholder?: T;
+              searchAction?: T;
+              servicesLabel?: T;
+              servicesHref?: T;
+              callLabel?: T;
+              callHref?: T;
+              primaryLabel?: T;
+              primaryHref?: T;
+              brandLabel?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -461,7 +555,7 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
         create?: T;
         update?: T;
       };
-  site?:
+  siteGlobals?:
     | T
     | {
         find?: T;
@@ -515,9 +609,9 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site".
+ * via the `definition` "site-globals".
  */
-export interface Site {
+export interface SiteGlobal {
   id: number;
   brand: {
     logo: number | Media;
@@ -542,7 +636,7 @@ export interface Site {
         /**
          * A reusable component document; its sections render globally on every page, in this order.
          */
-        component: number | Component;
+        component: number | Section;
         id?: string | null;
       }[]
     | null;
@@ -552,9 +646,9 @@ export interface Site {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site_select".
+ * via the `definition` "site-globals_select".
  */
-export interface SiteSelect<T extends boolean = true> {
+export interface SiteGlobalsSelect<T extends boolean = true> {
   brand?:
     | T
     | {

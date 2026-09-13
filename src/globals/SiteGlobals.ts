@@ -2,14 +2,16 @@ import type { GlobalConfig } from 'payload'
 
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
 import { siteGlobalSlug } from '../config/runtime'
+import { mediaSlug } from '../collections/Media'
+import { sectionsSlug } from '../collections/Sections'
 
 const slug = siteGlobalSlug
 
 const brand = {
   name: 'brand', type: 'group' as const, fields: [
-    { name: 'logo', type: 'upload' as const, relationTo: 'media' as const, required: true },
+    { name: 'logo', type: 'upload' as const, relationTo: mediaSlug, required: true },
     { name: 'logoAlt', localized: true, type: 'text' as const, required: true },
-    { name: 'favicon', type: 'upload' as const, relationTo: 'media' as const, required: true, admin: { description: 'Browser tab and app icon for the public website.' } },
+    { name: 'favicon', type: 'upload' as const, relationTo: mediaSlug, required: true, admin: { description: 'Browser tab and app icon for the public website.' } },
   ],
 }
 
@@ -38,7 +40,7 @@ export const SiteGlobals: GlobalConfig = {
           name: 'components', type: 'array', minRows: 0, labels: { singular: 'Global component', plural: 'Global components' },
           fields: [
             {
-              name: 'component', type: 'relationship', relationTo: 'components', required: true,
+              name: 'component', type: 'relationship', relationTo: sectionsSlug, required: true,
               admin: { description: 'A reusable component document; its sections render globally on every page, in this order.' },
             },
           ],

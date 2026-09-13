@@ -8,7 +8,7 @@ const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
 
 function validateSections(value: unknown) {
   if (!Array.isArray(value) || value.length === 0) {
-    return 'A Component requires at least one section.'
+    return 'A reusable section bundle requires at least one section.'
   }
 
   if (!value.every((section) => section && typeof section === 'object' && typeof section.blockType === 'string')) {
@@ -18,8 +18,10 @@ function validateSections(value: unknown) {
   return true
 }
 
-export const Components: CollectionConfig = {
-  slug: 'components',
+export const sectionsSlug = 'sections' as const
+
+export const Sections: CollectionConfig = {
+  slug: sectionsSlug,
   admin: {
     group: 'Pages',
     useAsTitle: 'title',
@@ -51,7 +53,7 @@ export const Components: CollectionConfig = {
         return true
       },
       admin: {
-        description: 'Unique key for this reusable component. Referenced by the site global\'s curated components list.',
+        description: 'Unique key for this reusable section bundle. Referenced by the site global\'s curated components list.',
         position: 'sidebar',
       },
     },
