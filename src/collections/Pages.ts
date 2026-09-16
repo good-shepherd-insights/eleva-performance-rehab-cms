@@ -3,6 +3,7 @@ import type { CollectionConfig, Field } from 'payload'
 import { sharedBlocks } from '@good-shepherd-insights/website-components/payload'
 
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
+import { sectionsSlug } from './Sections'
 
 import { websiteDeployWebhook } from '../config/runtime'
 
@@ -148,6 +149,16 @@ export const Pages: CollectionConfig = {
       minRows: 1,
       validate: validateSections,
       blocks: [...sharedBlocks],
+    },
+    {
+      name: 'hiddenGlobalComponents',
+      type: 'relationship',
+      relationTo: sectionsSlug,
+      hasMany: true,
+      required: false,
+      admin: {
+        description: 'Global components (from SiteGlobals.components) to hide on this page only.',
+      },
     },
   ],
 }

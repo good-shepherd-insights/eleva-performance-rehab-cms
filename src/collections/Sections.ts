@@ -22,10 +22,18 @@ export const sectionsSlug = 'sections' as const
 
 export const Sections: CollectionConfig = {
   slug: sectionsSlug,
+  // Real fix: this collection's actual job is holding sitewide global
+  // content (referenced from SiteGlobals.components) — a content editor
+  // should never author real page content here, only real global
+  // components (e.g. a Navbar/Footer). Relabeled and hidden from the
+  // dashboard/nav accordingly; still fully functional under the hood
+  // (editable via the API / local scripts).
+  labels: { singular: 'Global Component', plural: 'Global Components' },
   admin: {
     group: 'Pages',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
+    hidden: true,
     ...inlinePreviewAdmin,
   },
   access: {
