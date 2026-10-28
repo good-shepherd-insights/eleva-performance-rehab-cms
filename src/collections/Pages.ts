@@ -3,6 +3,7 @@ import type { CollectionConfig, Field } from 'payload'
 import { sharedBlocks } from '@good-shepherd-insights/website-components/payload'
 
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
+import { sectionsSlug } from './Sections'
 
 import { websiteDeployWebhook } from '../config/runtime'
 
@@ -130,24 +131,51 @@ export const Pages: CollectionConfig = {
         return true
       },
       admin: {
-        description: 'Shared route key. Example: about → /<locale>/about.',
+        description: 'Shared route key. Example: about → /about in the default locale, /<locale>/about otherwise.',
         position: 'sidebar',
       },
     },
     {
-      name: 'title',
-      type: 'text',
-      localized: true,
-      required: true,
-    },
-    metadata,
-    {
-      name: 'sections',
-      type: 'blocks',
-      required: true,
-      minRows: 1,
-      validate: validateSections,
-      blocks: [...sharedBlocks],
+      // Unnamed tabs (no `name` here) are a pure admin UI grouping in
+      // Payload — fields keep their exact same storage path either way,
+      // so moving `metadata` in here is safe: no schema change, no
+      // migration, existing data untouched.
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              localized: true,
+              required: true,
+            },
+            {
+              name: 'sections',
+              type: 'blocks',
+              required: true,
+              minRows: 1,
+              validate: validateSections,
+              blocks: [...sharedBlocks],
+            },
+            {
+              name: 'hiddenGlobalComponents',
+              type: 'relationship',
+              relationTo: sectionsSlug,
+              hasMany: true,
+              required: false,
+              admin: {
+                description: 'Global components (from SiteGlobals.components) to hide on this page only.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'SEO',
+          fields: [metadata],
+        },
+      ],
     },
   ],
 }

@@ -5,3 +5,6 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+
+overrides:
+  '@good-shepherd-insights/website-components': link:../website-components-template

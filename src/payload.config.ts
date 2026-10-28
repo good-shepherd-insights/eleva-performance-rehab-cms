@@ -1,4 +1,4 @@
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -9,17 +9,16 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
-import { Components } from './collections/Components'
+import { Sections } from './collections/Sections'
 import { SiteGlobals } from './globals/SiteGlobals'
 import { Pages } from './collections/Pages'
 import {
   blobReadWriteToken,
   cmsOrigin,
-  databasePush,
   defaultLocale,
   locales,
   payloadSecret,
-  postgresUrl,
+  mongodbUrl,
   siteGlobalSlug,
   siteOrigin,
 } from './config/runtime'
@@ -29,11 +28,14 @@ const dirname = path.dirname(filename)
 
 const siteBaseURL = `${siteOrigin}/`
 
+// Mirrors the website's route shape (Astro i18n, prefixDefaultLocale: false):
+// the default locale is unprefixed for every page (`/`, `/<slug>`), other
+// locales are prefixed (`/<locale>/`, `/<locale>/<slug>`).
 function getAstroPreviewURL(localeCode: string, slug?: string) {
-  let path = `${localeCode}/${encodeURIComponent(slug || '')}`
-  if (slug === 'home') path = localeCode === defaultLocale ? '' : `${localeCode}/`
+  const prefix = localeCode === defaultLocale ? '' : `${localeCode}/`
+  const page = slug === 'home' ? '' : encodeURIComponent(slug || '')
 
-  return new URL(path, siteBaseURL).toString()
+  return new URL(`${prefix}${page}`, siteBaseURL).toString()
 }
 
 export default buildConfig({
@@ -55,6 +57,13 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      graphics: {
+        Logo: '/admin/Logo#default',
+        Icon: '/admin/Icon#default',
+      },
+      afterLogin: ['/admin/PasskeyLogin#default'],
+    },
     livePreview: {
       url: ({ collectionConfig, data, locale }) => {
         if (collectionConfig?.slug === Pages.slug && typeof data.slug === 'string') {
@@ -64,7 +73,7 @@ export default buildConfig({
         return siteOrigin
       },
       globals: [siteGlobalSlug],
-      collections: [Pages.slug, Components.slug],
+      collections: [Pages.slug, Sections.slug],
       breakpoints: [
         { name: 'mobile', label: 'Mobile', width: 400, height: 900 },
         { name: 'tablet', label: 'Tablet', width: 900, height: 1000 },
@@ -72,7 +81,7 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Users, Media, Components, Pages],
+  collections: [Users, Media, Sections, Pages],
   globals: [SiteGlobals],
   editor: lexicalEditor(),
   localization: {
@@ -90,11 +99,8 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: vercelPostgresAdapter({
-    pool: {
-      connectionString: postgresUrl,
-    },
-    push: databasePush,
+  db: mongooseAdapter({
+    url: mongodbUrl,
   }),
   sharp,
   plugins: [

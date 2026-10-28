@@ -8,7 +8,7 @@ const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
 
 function validateSections(value: unknown) {
   if (!Array.isArray(value) || value.length === 0) {
-    return 'A Component requires at least one section.'
+    return 'A reusable section bundle requires at least one section.'
   }
 
   if (!value.every((section) => section && typeof section === 'object' && typeof section.blockType === 'string')) {
@@ -18,12 +18,22 @@ function validateSections(value: unknown) {
   return true
 }
 
-export const Components: CollectionConfig = {
-  slug: 'components',
+export const sectionsSlug = 'sections' as const
+
+export const Sections: CollectionConfig = {
+  slug: sectionsSlug,
+  // Real fix: this collection's actual job is holding sitewide global
+  // content (referenced from SiteGlobals.components) — a content editor
+  // should never author real page content here, only real global
+  // components (e.g. a Navbar/Footer). Relabeled and hidden from the
+  // dashboard/nav accordingly; still fully functional under the hood
+  // (editable via the API / local scripts).
+  labels: { singular: 'Global Component', plural: 'Global Components' },
   admin: {
     group: 'Pages',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
+    hidden: true,
     ...inlinePreviewAdmin,
   },
   access: {
@@ -51,7 +61,7 @@ export const Components: CollectionConfig = {
         return true
       },
       admin: {
-        description: 'Unique key for this reusable component. Referenced by the site global\'s curated components list.',
+        description: 'Unique key for this reusable section bundle. Referenced by the site global\'s curated components list.',
         position: 'sidebar',
       },
     },
