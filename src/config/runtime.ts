@@ -19,14 +19,6 @@ function requiredOrigin(name: string) {
   return url.origin
 }
 
-function requiredBooleanEnv(name: string) {
-  const value = requiredEnv(name)
-  if (value !== 'true' && value !== 'false') {
-    throw new Error(`${name} must be true or false`)
-  }
-  return value === 'true'
-}
-
 function configuredLocales(): LocaleConfig[] {
   const raw = requiredEnv('CMS_LOCALES')
   let value: unknown
@@ -78,12 +70,11 @@ export const siteGlobalSlug = requiredEnv('SITE_GLOBAL_SLUG')
 export const locales = configuredLocales()
 export const defaultLocale = requiredEnv('CMS_DEFAULT_LOCALE')
 export const websiteDeployWebhook = process.env.WEBSITE_DEPLOY_WEBHOOK_URL?.trim()
-export const databasePush = requiredBooleanEnv('PAYLOAD_DB_PUSH')
 
 if (!locales.some((locale) => locale.code === defaultLocale)) {
   throw new Error('CMS_DEFAULT_LOCALE must match a CMS_LOCALES code')
 }
 
 export const payloadSecret = requiredEnv('PAYLOAD_SECRET')
-export const postgresUrl = requiredEnv('POSTGRES_URL')
+export const mongodbUrl = requiredEnv('MONGODB_URL')
 export const blobReadWriteToken = requiredEnv('BLOB_READ_WRITE_TOKEN')

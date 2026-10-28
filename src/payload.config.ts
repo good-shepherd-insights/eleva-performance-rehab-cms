@@ -1,4 +1,4 @@
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -15,11 +15,10 @@ import { Pages } from './collections/Pages'
 import {
   blobReadWriteToken,
   cmsOrigin,
-  databasePush,
   defaultLocale,
   locales,
   payloadSecret,
-  postgresUrl,
+  mongodbUrl,
   siteGlobalSlug,
   siteOrigin,
 } from './config/runtime'
@@ -29,11 +28,14 @@ const dirname = path.dirname(filename)
 
 const siteBaseURL = `${siteOrigin}/`
 
+// Mirrors the website's route shape (Astro i18n, prefixDefaultLocale: false):
+// the default locale is unprefixed for every page (`/`, `/<slug>`), other
+// locales are prefixed (`/<locale>/`, `/<locale>/<slug>`).
 function getAstroPreviewURL(localeCode: string, slug?: string) {
-  let path = `${localeCode}/${encodeURIComponent(slug || '')}`
-  if (slug === 'home') path = localeCode === defaultLocale ? '' : `${localeCode}/`
+  const prefix = localeCode === defaultLocale ? '' : `${localeCode}/`
+  const page = slug === 'home' ? '' : encodeURIComponent(slug || '')
 
-  return new URL(path, siteBaseURL).toString()
+  return new URL(`${prefix}${page}`, siteBaseURL).toString()
 }
 
 export default buildConfig({
@@ -54,6 +56,13 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      graphics: {
+        Logo: '/admin/Logo#default',
+        Icon: '/admin/Icon#default',
+      },
+      afterLogin: ['/admin/PasskeyLogin#default'],
     },
     livePreview: {
       url: ({ collectionConfig, data, locale }) => {
@@ -90,11 +99,8 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: vercelPostgresAdapter({
-    pool: {
-      connectionString: postgresUrl,
-    },
-    push: databasePush,
+  db: mongooseAdapter({
+    url: mongodbUrl,
   }),
   sharp,
   plugins: [

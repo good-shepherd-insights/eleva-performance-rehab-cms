@@ -46,22 +46,27 @@ This CMS supplies:
    — `brand`, an `accessibility` label group, and a `components` array
    (ordered relationships to `components` documents); slug required from
    `SITE_GLOBAL_SLUG` (no default).
-4. **Database:** Vercel Postgres (`@payloadcms/db-vercel-postgres`,
-   `vercelPostgresAdapter`, reads `POSTGRES_URL`) — set
-   in `payload.config.ts`, with `PAYLOAD_DB_PUSH` controlling schema push.
+4. **Database:** MongoDB (`@payloadcms/db-mongodb`, `mongooseAdapter`,
+   reads `MONGODB_URL`) — set in `payload.config.ts`. No schema push or
+   structural migrations; field changes take effect from config alone.
 5. **Media storage:** Vercel Blob (`vercelBlobStorage` plugin,
    `BLOB_READ_WRITE_TOKEN`), not local disk.
-6. **Auth:** standard Payload email/password auth on `Users` — no custom
-   admin components are mounted.
+6. **Auth:** standard Payload email/password auth on `Users`, plus
+   optional passkey sign-in (`src/auth/passkeys.ts`, `PasskeyLogin.tsx`,
+   `PasskeyManager.tsx`) that issues the same Payload session.
+   **Admin branding:** `src/admin/Logo.tsx` (login logo) and
+   `src/admin/Icon.tsx` (nav icon) read the site global's `brand.logo` /
+   `brand.favicon` uploads and fall back to Payload's defaults when unset.
 7. **Localization:** declared once via `CMS_LOCALES`/`CMS_DEFAULT_LOCALE`
    (parsed in `src/config/runtime.ts`, passed to
    `payload.config.ts`'s `localization`) and exposed at a custom `/locales`
    endpoint the website calls at build time. Do not hand-maintain a second
    locale list on either side.
 8. **Live Preview:** `payload.config.ts`'s `livePreview.url` builds the
-   website preview URL per document via `getAstroPreviewURL`, which
-   special-cases `slug: "home"` to the unprefixed URL for the default
-   locale (`/<locale>/` prefixed otherwise). This must track the website's
+   website preview URL per document via `getAstroPreviewURL`: the default
+   locale is unprefixed for every page (`/`, `/<slug>`), other locales are
+   prefixed (`/<locale>/`, `/<locale>/<slug>`), and `slug: "home"` maps to
+   the locale root. This must track the website's
    actual route shape — a route change on the website side needs a
    matching change here.
 9. **Inline edit bridge:** `src/admin/livePreviewConfig.ts` /
@@ -166,7 +171,7 @@ that registration is the one mechanism for adding a section type; see
 3. Regenerate types after a schema change: `pnpm generate:types`.
 4. Regenerate the import map after adding/removing an admin component:
    `pnpm generate:importmap`.
-5. Run a migration: `pnpm migrate`. The template ships no tests; a project
+5. Run a data migration (only when existing documents must be reshaped): `pnpm migrate`. The template ships no tests; a project
    adds its own if it wants them.
 
 ## Out Of Scope

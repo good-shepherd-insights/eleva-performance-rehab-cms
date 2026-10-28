@@ -44,8 +44,7 @@ Media is stored in Vercel Blob (`BLOB_READ_WRITE_TOKEN`), not local disk.
 | `SITE_GLOBAL_SLUG` | Identifier for the shared site global |
 | `CMS_LOCALES` | JSON array of locale objects with `code`, `label`, and optional `rtl` |
 | `CMS_DEFAULT_LOCALE` | Locale code from `CMS_LOCALES` used as the default locale |
-| `POSTGRES_URL` | Vercel Postgres connection string |
-| `PAYLOAD_DB_PUSH` | Required `true` or `false` database schema-push setting |
+| `MONGODB_URL` | MongoDB connection string (database name in the path) |
 | `PAYLOAD_SECRET` | Secret used to sign Payload sessions and tokens |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token for media storage |
 | `ENABLE_INLINE_EDIT_BRIDGE` | Set to `true` to mount the inline click-to-edit Live Preview bridge |
