@@ -60,6 +60,13 @@ export default buildConfig({
         { rel: 'icon', type: 'image/png', url: '/eleva-icon.png' },
         { rel: 'apple-touch-icon', type: 'image/png', url: '/eleva-icon.png' },
       ],
+      description: 'Content management for Eleva Performance & Rehab.',
+      // replaces Payload's defaults ("Payload App" and its generated /api/og image)
+      openGraph: {
+        siteName: 'Eleva CMS',
+        description: 'Content management for Eleva Performance & Rehab.',
+        images: [{ url: `${cmsOrigin}/og-login.png`, width: 1200, height: 630, alt: 'Eleva CMS sign-in' }],
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname),

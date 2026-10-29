@@ -12,6 +12,7 @@ const brand = {
     { name: 'logo', type: 'upload' as const, relationTo: mediaSlug, required: false },
     { name: 'logoAlt', localized: true, type: 'text' as const, required: false },
     { name: 'favicon', type: 'upload' as const, relationTo: mediaSlug, required: false, admin: { description: 'Browser tab and app icon for the public website.' } },
+    { name: 'ogImage', type: 'upload' as const, relationTo: mediaSlug, required: false, admin: { description: 'Share image for links to the public website (1200×630). Falls back to the logo.' } },
   ],
 }
 
