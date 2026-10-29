@@ -1,0 +1,156 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+// Sign-in screens (login, forgot/reset password, first user) in the Eleva
+// website's style: its blue gradient, white card, fonts and pill buttons.
+
+.template-minimal {
+  --eleva-blue: #174fd6;
+  --eleva-blue-bright: #1d5bff;
+  --eleva-ink: #0a0d12;
+  --eleva-muted: #5f6672;
+  --eleva-line: #dfe3e9;
+  --eleva-white: #fff;
+  --eleva-display: "Manrope", sans-serif;
+  min-height: 100vh;
+  padding: 3rem 1.5rem;
+  background: linear-gradient(125deg, #0a318e, var(--eleva-blue) 56%, #2768ff);
+  font-family: "DM Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+
+  .template-minimal__wrap {
+    width: 100%;
+    max-width: 30rem;
+    padding: 3rem;
+    color: var(--eleva-ink);
+    background: var(--eleva-white);
+    border-radius: 1.25rem;
+    box-shadow: 0 1.5rem 4rem #0c163024;
+  }
+
+  .login__brand {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+
+    // the logo component sets its own inline size
+    img {
+      width: 15rem !important;
+      height: auto;
+      max-height: none !important;
+    }
+  }
+
+  h1,
+  h2 {
+    color: var(--eleva-ink);
+    font-family: var(--eleva-display);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+  }
+
+  p {
+    color: var(--eleva-muted);
+  }
+
+  .field-label {
+    color: var(--eleva-ink);
+    font-family: var(--eleva-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    .required {
+      color: var(--eleva-blue);
+    }
+  }
+
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    min-height: 3.25rem;
+    padding: 0.8rem 1.1rem;
+    color: var(--eleva-ink);
+    background: var(--eleva-white);
+    font-family: "DM Sans", sans-serif;
+    font-size: 0.95rem;
+    border: 1px solid var(--eleva-line);
+    border-radius: 0.75rem;
+    box-shadow: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+
+    &:hover {
+      border-color: #c4cad2;
+    }
+
+    &:focus,
+    &:focus-visible {
+      border-color: var(--eleva-blue);
+      box-shadow: 0 0 0 3px #174fd626;
+      outline: none;
+    }
+  }
+
+  a {
+    color: var(--eleva-blue);
+    font-size: 0.82rem;
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+  }
+
+  .btn {
+    width: 100%;
+    min-height: 3.25rem;
+    margin: 0;
+    padding: 0.8rem 1.35rem;
+    font: 700 0.86rem/1.2 var(--eleva-display);
+    border-radius: 999px;
+    box-shadow: none;
+    transition: transform 0.25s, background 0.25s, box-shadow 0.25s, border-color 0.25s;
+
+    &:hover {
+      transform: translateY(-0.16rem);
+      box-shadow: 0 0.8rem 2rem #174fd640;
+    }
+  }
+
+  .btn--style-primary {
+    color: var(--eleva-white);
+    background: var(--eleva-blue);
+    border: 0;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--eleva-white);
+      background: var(--eleva-blue-bright);
+    }
+  }
+
+  .btn--style-secondary {
+    color: var(--eleva-blue);
+    background: var(--eleva-white);
+    border: 1px solid var(--eleva-line);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--eleva-blue);
+      background: var(--eleva-white);
+      border-color: var(--eleva-blue);
+    }
+  }
+
+  .form-submit {
+    margin-top: 1.75rem;
+  }
+
+  // the passkey sign-in sits under the form
+  .login__form + div {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 580px) {
+    padding: 1.5rem 1rem;
+
+    .template-minimal__wrap {
+      padding: 2rem 1.5rem;
+    }
+  }
+}
