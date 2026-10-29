@@ -16,7 +16,7 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {
-    "@good-shepherd-insights/website-components": "npm:@good-shepherd-insights/eleva-rehab-components@^0.1.0",
+    "@good-shepherd-insights/website-components": "npm:@good-shepherd-insights/eleva-rehab-components@^0.1.1",
     "@payloadcms/db-mongodb": "3.88.0",
     "@payloadcms/next": "3.88.0",
     "@payloadcms/plugin-mcp": "^3.88.0",

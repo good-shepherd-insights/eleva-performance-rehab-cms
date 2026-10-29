@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@good-shepherd-insights/website-components':
-        specifier: npm:@good-shepherd-insights/eleva-rehab-components@^0.1.0
-        version: '@good-shepherd-insights/eleva-rehab-components@0.1.0(payload@3.88.0(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.7.3))(react@19.2.6)'
+        specifier: npm:@good-shepherd-insights/eleva-rehab-components@^0.1.1
+        version: '@good-shepherd-insights/eleva-rehab-components@0.1.1(payload@3.88.0(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.7.3))(react@19.2.6)'
       '@payloadcms/db-mongodb':
         specifier: 3.88.0
         version: 3.88.0(payload@3.88.0(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.7.3))
@@ -485,8 +485,8 @@ packages:
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
 
-  '@good-shepherd-insights/eleva-rehab-components@0.1.0':
-    resolution: {integrity: sha512-OMcB1ZEbwvkmtTqrsRkaKF5xOwkW/HVF/yGavNGkLEl1/Eleh2UkzUkoTsXKHa9gNDrS4LXqzWNm5jwngFmXXQ==, tarball: https://npm.pkg.github.com/download/@good-shepherd-insights/eleva-rehab-components/0.1.0/7c11fdc5d07a827b94eeac37ab2e4f31f76678c9}
+  '@good-shepherd-insights/eleva-rehab-components@0.1.1':
+    resolution: {integrity: sha512-UIz2fg6J0+FdoU2J9c25lUV8P5JVFOPHAJF+LCfc5J7/k646Z8c5YdwvrvA+iTU6K8NtUqjiotpydXdT8YOSHA==, tarball: https://npm.pkg.github.com/download/@good-shepherd-insights/eleva-rehab-components/0.1.1/002c440b2ea2e11957c15961f4d78755f4ac69a5}
     engines: {node: '>=20.9.0', pnpm: '>=9'}
     peerDependencies:
       payload: ^3.88.0
@@ -4199,7 +4199,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@good-shepherd-insights/eleva-rehab-components@0.1.0(payload@3.88.0(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.7.3))(react@19.2.6)':
+  '@good-shepherd-insights/eleva-rehab-components@0.1.1(payload@3.88.0(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.7.3))(react@19.2.6)':
     dependencies:
       payload: 3.88.0(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.7.3)
       react: 19.2.6
