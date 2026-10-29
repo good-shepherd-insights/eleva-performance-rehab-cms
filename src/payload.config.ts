@@ -54,6 +54,13 @@ export default buildConfig({
   ],
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: '- Eleva CMS',
+      icons: [
+        { rel: 'icon', type: 'image/png', url: '/eleva-icon.png' },
+        { rel: 'apple-touch-icon', type: 'image/png', url: '/eleva-icon.png' },
+      ],
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
