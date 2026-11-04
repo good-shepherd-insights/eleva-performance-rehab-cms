@@ -4,6 +4,7 @@ import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
 import { siteGlobalSlug } from '../config/runtime'
 import { mediaSlug } from '../collections/Media'
 import { sectionsSlug } from '../collections/Sections'
+import { rebuildWebsite } from '../hooks/rebuildWebsite'
 
 const slug = siteGlobalSlug
 
@@ -19,6 +20,7 @@ const brand = {
 export const SiteGlobals: GlobalConfig = {
   slug, label: 'Site Globals', access: { read: () => true },
   versions: { drafts: { autosave: { interval: 800 } } },
+  hooks: { afterChange: [rebuildWebsite] },
   admin: {
     group: 'Pages',
     ...inlinePreviewAdmin,

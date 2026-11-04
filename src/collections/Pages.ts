@@ -5,7 +5,7 @@ import { sharedBlocks } from '@good-shepherd-insights/website-components/payload
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
 import { sectionsSlug } from './Sections'
 
-import { websiteDeployWebhook } from '../config/runtime'
+import { rebuildWebsite } from '../hooks/rebuildWebsite'
 
 const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
 
@@ -93,24 +93,7 @@ export const Pages: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [
-      async ({ doc, req }) => {
-        if (doc._status !== 'published') return doc
-        if (!websiteDeployWebhook) return doc
-
-        try {
-          const response = await fetch(websiteDeployWebhook, { method: 'POST' })
-          if (!response.ok) {
-            throw new Error(`Website deploy webhook failed with ${response.status} ${response.statusText}`)
-          }
-        } catch (error) {
-          req.payload.logger.error(error instanceof Error ? error.message : 'Website deploy webhook failed')
-          throw error
-        }
-
-        return doc
-      },
-    ],
+    afterChange: [rebuildWebsite],
   },
   fields: [
     {

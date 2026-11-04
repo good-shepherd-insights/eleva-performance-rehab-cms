@@ -75,9 +75,11 @@ This CMS supplies:
 10. **MCP:** `@payloadcms/plugin-mcp`, scoped per resource in
     `payload.config.ts` — `Pages` (`create`/`find`/`update` enabled), the
     configured site global (`find`/`update` enabled). Not a blanket grant.
-11. **Deploy webhook:** publishing a `pages` document (not a draft save)
-    fires `WEBSITE_DEPLOY_WEBHOOK_URL` (`Pages.ts`, `afterChange`
-    hook) — this is what triggers a website rebuild.
+11. **Deploy webhook:** publishing a `pages` document, a global
+    component (`Sections.ts`) or the site global (not a draft save or
+    autosave) fires `WEBSITE_DEPLOY_WEBHOOK_URL` (the shared
+    `src/hooks/rebuildWebsite.ts` `afterChange` hook on all three) — this
+    is what triggers a website rebuild.
 
 ## System Design
 
@@ -97,8 +99,8 @@ End-to-end, across both repositories:
    `livePreview.url` (item 8 above) plus the website's
    `InlinePreviewBootstrap.astro` / `data-inline-edit` attributes on the
    other side of that same bridge.
-4. Publishing a `pages` document (not draft-saving) fires the deploy
-   webhook (item 11 above).
+4. Publishing a `pages` document, a global component or the site global
+   (not draft-saving) fires the deploy webhook (item 11 above).
 5. The website's build fetches the site global from
    `/api/globals/<SITE_GLOBAL_SLUG>` and `Page` documents from `/api/pages`,
    validates them
@@ -152,16 +154,6 @@ that registration is the one mechanism for adding a section type; see
    unspecified. Not checked against Payload's docs here — do not assume it
    requires authentication, and do not assume it doesn't, before verifying
    against current Payload docs or a real request.
-2. **Publishing the site global does not rebuild the website — only
-   publishing a `pages` document does.** `src/globals/SiteGlobals.ts` has no
-   `hooks` block at all (grep-verified: no `afterChange`, no reference to
-   `WEBSITE_DEPLOY_WEBHOOK_URL`); only `src/collections/Pages.ts`
-   has the deploy-webhook `afterChange` hook. An editor who changes and
-   publishes brand/accessibility/components content and expects the live
-   site to update will not see it until something else triggers a rebuild
-   (e.g. a `pages` document is also published, or a manual deploy). Not
-   fixed here — this may be intentional (shell changes rarer, bundled
-   with other work) or an oversight; don't assume either without asking.
 
 ## Development
 

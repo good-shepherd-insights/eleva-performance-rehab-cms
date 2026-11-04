@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { sharedBlocks } from '@good-shepherd-insights/website-components/payload'
 
 import { inlinePreviewAdmin } from '../admin/livePreviewConfig'
+import { rebuildWebsite } from '../hooks/rebuildWebsite'
 
 const reservedSlugs = new Set(['admin', 'api', 'robots.txt'])
 
@@ -41,6 +42,9 @@ export const Sections: CollectionConfig = {
   },
   versions: {
     drafts: true,
+  },
+  hooks: {
+    afterChange: [rebuildWebsite],
   },
   fields: [
     {
