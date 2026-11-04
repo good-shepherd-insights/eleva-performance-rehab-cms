@@ -8,7 +8,7 @@ export const Users: CollectionConfig = {
     useAsTitle: 'name',
     group: 'Admin',
   },
-  auth: true,
+  auth: { useAPIKey: true },
   endpoints: passkeyEndpoints,
   fields: [
     { name: 'name', type: 'text' },
